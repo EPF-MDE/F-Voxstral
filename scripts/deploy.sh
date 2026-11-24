@@ -55,7 +55,11 @@ if [[ -z "$published" ]]; then
 fi
 
 URL="http://localhost:${APP_PORT:-8080}/healthz"
-log "Waiting for ${URL} (first GPU start downloads the model, can take 10+ min)"
+if [[ "$MODE" == "gpu" ]]; then
+  log "Waiting for ${URL} (first GPU start downloads the model, can take 10+ min)"
+else
+  log "Waiting for ${URL} (mock backend, should take a few seconds)"
+fi
 for i in $(seq 1 180); do
   if curl -fsS "$URL" >/dev/null 2>&1; then break; fi
   if (( i % 6 == 0 )); then "${COMPOSE[@]}" logs --tail 3 backend || true; fi
