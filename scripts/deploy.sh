@@ -44,6 +44,16 @@ fi
 log "Building and starting (${MODE})..."
 "${COMPOSE[@]}" up -d --build
 
+# Docker Desktop (Windows/macOS) can start the container without publishing the
+# port when another program already listens on it: fail fast instead of waiting.
+APP_CID=$("${COMPOSE[@]}" ps -q app)
+published=$(docker inspect "$APP_CID" --format '{{range (index .NetworkSettings.Ports "8080/tcp")}}{{.HostPort}}{{end}}')
+if [[ -z "$published" ]]; then
+  echo "Port ${APP_PORT:-8080} could not be published on the host: another program is probably using it." >&2
+  echo "Free it, or set APP_PORT to a free port in .env, then rerun." >&2
+  exit 1
+fi
+
 URL="http://localhost:${APP_PORT:-8080}/healthz"
 log "Waiting for ${URL} (first GPU start downloads the model, can take 10+ min)"
 for i in $(seq 1 180); do
