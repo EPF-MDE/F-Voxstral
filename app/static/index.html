@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Voxtral Live Translate</title>
+  <style>
+    :root { --bg:#f7f7f8; --fg:#1b1b1f; --muted:#6b6b76; --card:#fff; --accent:#ff7000; --err:#c0392b; }
+    @media (prefers-color-scheme: dark) { :root { --bg:#141416; --fg:#ececf1; --muted:#9a9aa5; --card:#1f1f23; } }
+    * { box-sizing: border-box; }
+    body { margin:0; font:16px/1.5 system-ui, sans-serif; background:var(--bg); color:var(--fg); }
+    header, .controls, main { max-width: 900px; margin: 0 auto; padding: 16px; }
+    header { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; }
+    h1 { font-size: 1.3rem; margin: 0; }
+    #status { color: var(--muted); font-size: .9rem; }
+    #status.ok { color: #2e8b57; } #status.err { color: var(--err); }
+    .controls { display:flex; gap:12px; flex-wrap:wrap; align-items:end; }
+    label { display:flex; flex-direction:column; font-size:.85rem; color:var(--muted); }
+    select, button { font:inherit; padding:8px 12px; border-radius:8px; border:1px solid #8884; background:var(--card); color:var(--fg); }
+    button#start { background: var(--accent); color:#fff; border:none; }
+    button:disabled { opacity:.5; }
+    meter { width: 120px; height: 12px; }
+    article { background:var(--card); border-radius:10px; padding:12px 16px; margin-bottom:10px; box-shadow:0 1px 2px #0002; }
+    .tr { font-size:1.15rem; margin:0 0 4px; }
+    .src { color:var(--muted); margin:0; }
+    .meta { color:var(--muted); font-size:.75rem; margin:4px 0 0; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Voxtral — voix → texte traduit en temps réel</h1>
+    <span id="status">prêt</span>
+  </header>
+  <section class="controls">
+    <label>Langue parlée
+      <select id="src">
+        <option value="auto">Détection auto</option>
+        <option value="fr">Français</option><option value="en">English</option>
+        <option value="es">Español</option><option value="de">Deutsch</option>
+        <option value="it">Italiano</option><option value="pt">Português</option>
+        <option value="nl">Nederlands</option><option value="hi">हिन्दी</option>
+      </select>
+    </label>
+    <label>Traduire en
+      <select id="tgt">
+        <option value="en">English</option><option value="fr">Français</option>
+        <option value="es">Español</option><option value="de">Deutsch</option>
+        <option value="it">Italiano</option><option value="pt">Português</option>
+        <option value="nl">Nederlands</option><option value="hi">हिन्दी</option>
+      </select>
+    </label>
+    <button id="start">🎙 Démarrer</button>
+    <button id="stop" disabled>■ Arrêter</button>
+    <label>Niveau micro <meter id="level" min="0" max="1" value="0"></meter></label>
+  </section>
+  <main id="out"></main>
+  <script src="/static/app.js"></script>
+</body>
+</html>

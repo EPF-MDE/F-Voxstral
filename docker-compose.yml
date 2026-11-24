@@ -1,0 +1,18 @@
+# Base stack: the web app. Combine with ONE backend override:
+#   GPU VM : docker compose -f docker-compose.yml -f compose.gpu.yml up -d --build
+#   Local  : docker compose -f docker-compose.yml -f compose.mock.yml up -d --build
+name: voxtral-live
+
+services:
+  app:
+    build: ./app
+    env_file: .env
+    environment:
+      VLLM_BASE_URL: http://backend:8000/v1
+    ports:
+      # bound to localhost only: on a shared VM, access it through an SSH tunnel
+      - "${APP_BIND:-127.0.0.1}:${APP_PORT:-8080}:8080"
+    depends_on:
+      backend:
+        condition: service_healthy
+    restart: unless-stopped

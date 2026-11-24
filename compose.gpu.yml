@@ -1,0 +1,39 @@
+# Real backend: Voxtral served by vLLM on an NVIDIA GPU.
+services:
+  backend:
+    build:
+      context: ./vllm
+      args:
+        VLLM_VERSION: ${VLLM_VERSION:-v0.10.1.1}
+    env_file: .env
+    command: >
+      --model ${MODEL_NAME:-mistralai/Voxtral-Mini-3B-2507}
+      --tokenizer_mode mistral --config_format mistral --load_format mistral
+      --max-model-len ${MAX_MODEL_LEN:-8192}
+      --gpu-memory-utilization ${GPU_MEM_UTIL:-0.45}
+      --max-num-seqs ${MAX_NUM_SEQS:-8}
+      --api-key ${VLLM_API_KEY:-EMPTY}
+      --port 8000
+      ${VLLM_EXTRA_ARGS:-}
+    volumes:
+      - hf-cache:/root/.cache/huggingface
+    ports:
+      - "127.0.0.1:${VLLM_PORT:-8000}:8000"
+    ipc: host
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              device_ids: ["${GPU_ID:-0}"]
+              capabilities: [gpu]
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 900s   # first start downloads ~9 GB of weights
+    restart: unless-stopped
+
+volumes:
+  hf-cache:

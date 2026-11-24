@@ -1,0 +1,12 @@
+# Local test backend (no GPU): OpenAI-compatible mock of vLLM.
+services:
+  backend:
+    build: ./mock
+    environment:
+      MODEL_NAME: ${MODEL_NAME:-mistralai/Voxtral-Mini-3B-2507}
+      MOCK_DELAY_S: "0.3"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:8000/health')"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
